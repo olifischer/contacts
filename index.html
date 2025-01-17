@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .view-button {
+            background: #48bb78;
+        }
+
+        .view-button:hover {
+            background: #38a169;
+        }
+
+        .success-message {
+            display: none;
+            color: #48bb78;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #4a5568;
+            padding: 0.5rem;
+            width: auto;
+        }
+
+        .table-container {
+            overflow-y: auto;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .contacts-list {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .contacts-list thead {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .contacts-list th {
+            background: #f7fafc;
+            font-weight: 600;
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .contacts-list th, .contacts-list td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .copyright {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div class="copyright">osf 2025</div>
+    <div class="container">
+        <h1>Contact Information</h1>
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <button class="view-button" id="viewContacts">View Contacts</button>
+        <div id="successMessage" class="success-message">
+            Information saved successfully!
+        </div>
+    </div>
+
+    <div id="contactsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Saved Contacts</h2>
+                <button class="close-button" id="closeModal">&times;</button>
+            </div>
+            <div class="table-container">
+                <table class="contacts-list">
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contactsList">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            
+            const data = `${firstName},${lastName},${email}\n`;
+            
+            try {
+                const response = await fetch('/save-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: data
+                });
+                
+                if (response.ok) {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('contactForm').reset();
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        // View Contacts Modal
+        const modal = document.getElementById('contactsModal');
+        const viewButton = document.getElementById('viewContacts');
+        const closeButton = document.getElementById('closeModal');
+        const contactsList = document.getElementById('contactsList');
+
+        viewButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/get-contacts');
+                const contacts = await response.text();
+                
+                // Clear existing content
+                contactsList.innerHTML = '';
+                
+                // Parse CSV and create table rows
+                contacts.split('\n').filter(line => line.trim()).forEach(contact => {
+                    const [firstName, lastName, email] = contact.split(',');
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${firstName}</td>
+                        <td>${lastName}</td>
+                        <td>${email}</td>
+                    `;
+                    contactsList.appendChild(row);
+                });
+                
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error('Error fetching contacts:', error);
+            }
+        });
+
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 
