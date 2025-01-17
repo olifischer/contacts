@@ -2,8 +2,6 @@
 
 A simple, modern web application for managing contacts with a beautiful user interface. The application allows users to store and view contact information (first name, last name, and email) in a clean, responsive design.
 
-![Contact Form Preview](https://via.placeholder.com/600x400?text=Contact+Form+Preview)
-
 ## Features
 
 - 🎨 Modern, responsive UI with gradient background
